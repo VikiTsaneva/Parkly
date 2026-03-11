@@ -56,7 +56,7 @@ const parkingSpotsData = [
 const installBanner = document.getElementById('installBanner');
 const installBtn = document.getElementById('installBtn');
 const closeInstallBanner = document.getElementById('closeInstallBanner');
-const permanentInstallBtn = document.getElementById('permanentInstallBtn');
+const installNavItem = document.getElementById('install-nav-item');
 const iosInstructions = document.getElementById('iosInstructions');
 
 // Проверка дали е iOS
@@ -74,7 +74,7 @@ function isRunningStandalone() {
 function updateInstallButton() {
     if (isRunningStandalone()) {
         // Вече е инсталирано - скриваме бутоните
-        if (permanentInstallBtn) permanentInstallBtn.style.display = 'none';
+        if (installNavItem) installNavItem.style.display = 'none';
         if (installBanner) installBanner.style.display = 'none';
         if (iosInstructions) iosInstructions.style.display = 'none';
         return;
@@ -82,12 +82,12 @@ function updateInstallButton() {
 
     if (isIOS()) {
         // iOS - показваме инструкции
-        if (permanentInstallBtn) permanentInstallBtn.style.display = 'block';
+        if (installNavItem) installNavItem.style.display = 'flex';
         if (iosInstructions) iosInstructions.style.display = 'block';
         if (installBanner) installBanner.style.display = 'none';
     } else {
         // Android/други - показваме бутона
-        if (permanentInstallBtn) permanentInstallBtn.style.display = 'block';
+        if (installNavItem) installNavItem.style.display = 'flex';
         if (iosInstructions) iosInstructions.style.display = 'none';
         
         // Показваме банера ако има deferredPrompt
@@ -382,9 +382,6 @@ async function displayFavorites() {
                 <span class="lang-en">Status: </span>
                 <span class="${statusClass}" style="padding: 3px 8px; border-radius: 5px;">${statusText}</span>
             </p>
-            ${spot.id === 'spot1' && currentUser ? `<p><i class="fas fa-ruler"></i> Разстояние: ${spot1Distance} см</p>` : ''}
-            ${spot.id === 'spot2' && currentUser ? `<p><i class="fas fa-ruler"></i> Разстояние: ${spot2Distance} см</p>` : ''}
-            ${spot.id === 'spot3' && currentUser ? `<p><i class="fas fa-ruler"></i> Разстояние: ${spot3Distance} см</p>` : ''}
             
             <div class="favorite-actions">
                 <button class="navigate-btn" onclick="navigateToSpot(${spot.lat}, ${spot.lng}, '${spot.name}')">
@@ -987,10 +984,6 @@ function updateSpotStatus(spotNumber, status, distance) {
     
     statusElement.innerHTML = icon + ' ' + statusText;
     statusElement.className = 'status-value ' + statusClass;
-    
-    if (distance > 0) {
-        statusElement.title = (currentLang === 'bg' ? 'Разстояние: ' : 'Distance: ') + distance + ' cm';
-    }
 }
 
 function updateMapColors() {
@@ -1224,15 +1217,7 @@ function createParkingSpots() {
         popupContent += '<i class="fas fa-circle" style="color: ' + fillColor + '; font-size: 10px;"></i><strong>Статус:</strong> <span style="color: ' + fillColor + '; font-weight: 700;">' + statusText + '</span>';
         popupContent += '</div>';
         
-        if (i === 0 && currentUser) {
-            popupContent += '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;"><i class="fas fa-ruler"></i><strong>Разстояние:</strong> ' + spot1Distance + ' см</div>';
-        }
-        if (i === 1 && currentUser) {
-            popupContent += '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;"><i class="fas fa-ruler"></i><strong>Разстояние:</strong> ' + spot2Distance + ' см</div>';
-        }
-        if (i === 2 && currentUser) {
-            popupContent += '<div style="display: flex; alignments: center; gap: 8px; margin-bottom: 8px;"><i class="fas fa-ruler"></i><strong>Разстояние:</strong> ' + spot3Distance + ' см</div>';
-        }
+
         
         if (!currentUser) {
             popupContent += '<div style="margin-top: 8px; padding: 8px; background: #fff3cd; border-radius: 8px; color: #856404;"><i class="fas fa-lock"></i> Влезте, за да видите статуса</div>';
@@ -1734,18 +1719,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('googleLoginBtn').addEventListener('click', () => signInWithGoogle('login'));
     document.getElementById('googleRegisterBtn').addEventListener('click', () => signInWithGoogle('register'));
-    
-    document.getElementById('search-btn').addEventListener('click', function() {
-        const searchTerm = document.getElementById('search-input').value;
-        if (searchTerm.trim() !== '') {
-            const currentLang = document.body.getAttribute('data-lang') || 'bg';
-            showNotification(
-                currentLang === 'bg' ? '🔍 Търсене' : '🔍 Search',
-                currentLang === 'bg' ? 'Намиране на резултати за: "' + searchTerm + '"' : 'Finding results for: "' + searchTerm + '"',
-                '🔍'
-            );
-        }
-    });
     
     const darkmodeToggle = document.getElementById('darkmode-toggle');
     if (darkmodeToggle) {
